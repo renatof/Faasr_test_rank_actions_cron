@@ -1,0 +1,67 @@
+{
+    "ComputeServers": {
+        "My_GitHub_Account": {
+            "FaaSType": "GitHubActions",
+            "UserName": "renatof",
+            "ActionRepoName": "Faasr_test_rank_actions_cron",
+            "Branch": "main",
+            "Token": "My_GitHub_Account_TOKEN"
+        }
+    },
+    "DataStores": {
+        "My_FaaSr_Bucket": {
+            "Endpoint": "https://s3.faasr.io",
+            "Bucket": "bucket3",
+            "Writable": "TRUE",
+            "AccessKey": "My_FaaSr_Bucket_ACCESS_KEY",
+            "SecretKey": "My_FaaSr_Bucket_SECRET_KEY"
+        }
+    },
+    "FunctionList": {
+        "start": {
+            "FunctionName": "generate_weather_data",
+            "FaaSServer": "My_GitHub_Account",
+            "Arguments": {
+                "folder": "weather_raw",
+                "region_prefix": "raw",
+                "num_regions": 10
+            },
+            "InvokeNext": "analyze(10)"
+        },
+        "analyze": {
+            "FunctionName": "analyze_regional_weather",
+            "FaaSServer": "My_GitHub_Account",
+            "Arguments": {
+                "folder": "weather_raw",
+                "region_prefix": "raw",
+                "stats_prefix": "stats",
+                "output_folder": "weather_report"
+            },
+            "InvokeNext": "report"
+        },
+        "report": {
+            "FunctionName": "compile_global_report",
+            "FaaSServer": "My_GitHub_Account",
+            "Arguments": {
+                "folder": "weather_report",
+                "expected_regions": 10,
+                "stats_prefix": "stats"
+            }
+        }
+    },
+    "ActionContainers": {
+        "start": "ghcr.io/faasr/github-actions-tidyverse:1.4.2",
+        "analyze": "ghcr.io/faasr/github-actions-tidyverse:1.4.2",
+        "report": "ghcr.io/faasr/github-actions-tidyverse:1.4.2"
+    },
+    "FunctionGitRepo": {
+        "generate_weather_data": "Ashish-Ramrakhiani/Faasr_test_rank",
+        "analyze_regional_weather": "Ashish-Ramrakhiani/Faasr_test_rank",
+        "compile_global_report": "Ashish-Ramrakhiani/Faasr_test_rank"
+    },
+    "FunctionInvoke": "start",
+    "FaaSrLog": "FaaSrLogtest",
+    "LoggingDataStore": "My_FaaSr_Bucket",
+    "DefaultDataStore": "My_FaaSr_Bucket"
+}
+
